@@ -94,11 +94,13 @@
     .overlay-head { height: 80px; }
     .overlay-title { font-size: 18px; }
     .close { top: 24px; right: 16px; width: 32px; height: 32px; }
-    .shots, .shots-4 { width: calc(100% - 32px); padding-bottom: 16px; }
-    .shots-1 img { max-width: 100%; }
-    .shots-2 { gap: 10px; }
-    .shots-2 img { max-width: calc(50% - 5px); max-height: calc(100dvh - 110px); }
-    .shots-4 { gap: 10px; }
+    /* One column; only the screenshots scroll, the header stays put */
+    .shots, .shots-4 {
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px;
+      width: 100%; padding: 0 16px 16px;
+      overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    }
+    .shots img, .shots-1 img, .shots-2 img, .shots-4 img { flex: none; width: 100%; max-width: 100%; max-height: none; }
   }
 </style>
 </head>
