@@ -14,13 +14,14 @@
     font: 400 clamp(22px, 1.25vw, 30px)/1.1875 "Neue Montreal", "Helvetica Neue", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    color: #FAFAFA;
-    background: #000;
+    color: #000;
+    background: #DEDEDE;
   }
   h1, h2, p { margin: 0; font-weight: 400; font-size: inherit; }
   .tool h2, .tool b { font-weight: 800; }
   a { color: inherit; text-decoration: none; }
   img { display: block; max-width: 100%; height: auto; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 
   .wrap { width: calc(100% - 40px); margin: 0 auto; }
   .title { padding-top: 20px; font-size: clamp(48px, 7.03vw, 160px); line-height: 0.9; }
@@ -38,13 +39,39 @@
   .text p a { border-bottom: 1px solid currentcolor; }
   .text p a:hover { border-bottom-color: transparent; }
 
-  .icon { flex: none; width: clamp(120px, 10vw, 220px); padding: 1px; border: 1px solid currentcolor; border-radius: 24%; }
-  .icon img { border-radius: 23%; }
+  .media { flex: none; width: clamp(120px, 10vw, 220px); text-align: center; }
+  .icon { display: block; padding: 3px; background: #F5F5F5; border: 1px solid #BDBDBD; border-radius: 24%; }
+  .icon img { border-radius: 22%; }
+  .show { margin-top: 10px; font-size: 12px; line-height: 1; border-bottom: 1px solid currentcolor; }
+  .show:hover { border-bottom-color: transparent; }
 
   .footer { display: flex; flex-wrap: wrap; gap: 10px 2ch; padding-top: 20px; padding-bottom: 20px; }
   .footer a { border-bottom: 1px solid currentcolor; }
   .footer a:hover { border-bottom-color: transparent; }
   .footer span { margin-left: auto; }
+
+  /* Screenshot overlay */
+  .overlay {
+    position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
+    margin: 0; padding: 0; border: 0; color: #FFF; background: rgba(0, 0, 0, 0.84);
+  }
+  .overlay::backdrop { background: transparent; }
+  .overlay:focus { outline: none; }
+  .overlay[open] { display: flex; flex-direction: column; align-items: center; }
+  .overlay-head { flex: none; position: relative; width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; }
+  .overlay-title { font-size: 22px; }
+  .close { position: absolute; top: 40px; right: 40px; width: 40px; height: 40px; }
+  .close svg { display: block; width: 100%; height: 100%; }
+  .close:focus:not(:focus-visible) { outline: none; }
+  .shots { flex: 1; min-height: 0; width: calc(100% - 80px); padding-bottom: 40px; display: flex; align-items: flex-start; justify-content: center; }
+  .shots img { max-height: calc(100vh - 160px); max-height: calc(100dvh - 160px); width: auto; }
+  .shots-1 img { max-width: 80vw; }
+  .shots-2 { gap: 20px; }
+  .shots-2 img { min-width: 0; max-width: calc(50% - 10px); }
+  .shots-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-content: start;
+    width: min(calc(100% - 80px), calc((100vh - 180px) * 1.6)); width: min(calc(100% - 80px), calc((100dvh - 180px) * 1.6)); }
+  .shots-4 img { width: 100%; max-height: none; }
+  body:has(.overlay[open]) { overflow: hidden; }
 
   @media (max-width: 1023px) {
     body { font-size: 20px; }
@@ -56,10 +83,18 @@
     .grid { grid-template-columns: 1fr; }
     .grid > * + * { margin-top: 1.1875em; }
     .about { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 20px; }
-    .about > div { display: contents; }
+    .about > div:not(.media) { display: contents; }
     .about p { grid-column: 1 / -1; margin-top: 1.1875em; }
     .footer { padding-top: 10px; padding-bottom: 10px; }
     .footer span { width: 100%; margin-left: 0; }
+    .overlay-head { height: 80px; }
+    .overlay-title { font-size: 18px; }
+    .close { top: 24px; right: 16px; width: 32px; height: 32px; }
+    .shots, .shots-4 { width: calc(100% - 32px); padding-bottom: 16px; }
+    .shots-1 img { max-width: 100%; }
+    .shots-2 { gap: 10px; }
+    .shots-2 img { max-width: calc(50% - 5px); max-height: calc(100dvh - 110px); }
+    .shots-4 { gap: 10px; }
   }
 </style>
 </head>
@@ -72,10 +107,23 @@
 
 <main class="wrap" id="tools">
 
-  <!-- One <section class="tool grid text"> per tool. -->
+  <!--
+    One <section class="tool grid text"> per tool.
+    Screenshots live in a <template class="shots shots-N"> (N = 1, 2 or 4) so they
+    only load when "Show Screenshot" is clicked.
+  -->
   <section class="tool grid text" id="soundwatch">
     <div class="about">
-      <a class="icon" href="https://github.com/itymarcel/soundwatch" target="_blank" rel="noopener"><img src="soundwatch.png" width="256" height="256" alt="soundwatch app icon"></a>
+      <div class="media">
+        <a class="icon" href="https://github.com/itymarcel/soundwatch" target="_blank" rel="noopener"><img src="soundwatch.png" width="256" height="256" alt="soundwatch app icon"></a>
+        <button class="show" type="button">Show Screenshot</button>
+        <template data-layout="4">
+          <img src="screenshots/soundwatch-1.gif" width="480" height="300" alt="soundwatch visualizing music">
+          <img src="screenshots/soundwatch-2.gif" width="480" height="300" alt="soundwatch visualizing music">
+          <img src="screenshots/soundwatch-3.gif" width="480" height="300" alt="soundwatch visualizing music">
+          <img src="screenshots/soundwatch-4.gif" width="480" height="300" alt="soundwatch visualizing music">
+        </template>
+      </div>
       <div>
       <h2>soundwatch</h2>
       <p>A music visualizer for macOS. It listens to whatever your Mac is playing, on any output, and draws it. Screen-record it for reels, release teasers and visuals, or just leave it running while you work.</p>
@@ -91,7 +139,13 @@
 
   <section class="tool grid text" id="physkit">
     <div class="about">
-      <a class="icon" href="https://github.com/itymarcel/physkit" target="_blank" rel="noopener"><img src="physkit.png" width="900" height="900" alt="PhysKit icon"></a>
+      <div class="media">
+        <a class="icon" href="https://github.com/itymarcel/physkit" target="_blank" rel="noopener"><img src="physkit.png" width="900" height="900" alt="PhysKit icon"></a>
+        <button class="show" type="button">Show Screenshot</button>
+        <template data-layout="1">
+          <img src="screenshots/physkit.png" width="1330" height="993" alt="PhysKit plugin window">
+        </template>
+      </div>
       <div>
       <h2>PhysKit</h2>
       <p>A pad-based drum machine plugin that adds a physical touch to the sound. It plays Logic's Drum Kit Designer kits, with a channel strip per pad and a Physics control that models how a real player hits the kit.</p>
@@ -107,7 +161,14 @@
 
   <section class="tool grid text" id="piano-scales">
     <div class="about">
-      <a class="icon" href="https://piano-scales-production.up.railway.app/" target="_blank" rel="noopener"><img src="piano-scales.png" width="900" height="900" alt="Piano Scales app icon"></a>
+      <div class="media">
+        <a class="icon" href="https://piano-scales-production.up.railway.app/" target="_blank" rel="noopener"><img src="piano-scales.png" width="900" height="900" alt="Piano Scales app icon"></a>
+        <button class="show" type="button">Show Screenshot</button>
+        <template data-layout="2">
+          <img src="screenshots/piano-scales-1.png" width="1179" height="2556" alt="Piano Scales on a phone">
+          <img src="screenshots/piano-scales-2.png" width="1179" height="2556" alt="Piano Scales on a phone">
+        </template>
+      </div>
       <div>
       <h2>Piano Scales</h2>
       <p>A pocket scale reference. A two-octave keyboard shows the notes of any key in all seven modes, from Major and Minor to Dorian, Lydian and Locrian. Tap or click left and right to change key, up and down to change mode.</p>
@@ -120,6 +181,28 @@
     </div>
   </section>
 
+  <section class="tool grid text" id="webcam-to-midi">
+    <div class="about">
+      <div class="media">
+        <a class="icon" href="https://github.com/itymarcel/webcam-to-midi" target="_blank" rel="noopener"><img src="webcam-to-midi.png" width="900" height="900" alt="Webcam to MIDI app icon"></a>
+        <button class="show" type="button">Show Screenshot</button>
+        <template data-layout="1">
+          <img src="screenshots/webcam-to-midi.png" width="1420" height="1051" alt="Webcam to MIDI tracking a fingertip">
+        </template>
+      </div>
+      <div>
+      <h2>Webcam to MIDI</h2>
+      <p>Turns your hand into a MIDI controller. It tracks your index fingertip with the webcam and sends its position to your DAW as two CC values, left to right on CC 20 and bottom to top on CC 21. Map them to a filter, a send, anything you'd ride with a knob. Tracking runs on your computer and the app makes no network requests.</p>
+      <p>macOS, Apple Silicon and Intel<br>Windows 10 and 11, needs loopMIDI</p>
+      </div>
+    </div>
+    <div>
+      <p><b>Download</b><br><a href="https://github.com/itymarcel/webcam-to-midi/releases/download/v0.10/Webcam-to-MIDI-macOS-universal.dmg">Webcam to MIDI for macOS</a><br><a href="https://github.com/itymarcel/webcam-to-midi/releases/download/v0.10/Webcam-to-MIDI-Windows-x64-setup.exe">Webcam to MIDI for Windows</a></p>
+      <p><b>Source</b><br><a href="https://github.com/itymarcel/webcam-to-midi" target="_blank" rel="noopener">github.com/itymarcel/webcam-to-midi</a></p>
+      <p><b>All versions</b><br><a href="https://github.com/itymarcel/webcam-to-midi/releases/latest" target="_blank" rel="noopener">Latest release</a></p>
+    </div>
+  </section>
+
 </main>
 
 <footer class="wrap footer">
@@ -128,6 +211,43 @@
   <a href="https://buymeacoffee.com/mcut3000" target="_blank" rel="noopener">Buy me a coffee</a>
   <span>&copy; finji / mcut3000</span>
 </footer>
+
+<dialog class="overlay" aria-labelledby="overlay-title" tabindex="-1" autofocus>
+  <div class="overlay-head">
+    <h2 class="overlay-title" id="overlay-title"></h2>
+    <button class="close" type="button" aria-label="Close">
+      <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M3 3l34 34M37 3L3 37"/></svg>
+    </button>
+  </div>
+  <div class="shots"></div>
+</dialog>
+
+<script>
+  (function () {
+    var overlay = document.querySelector('.overlay');
+    var title = overlay.querySelector('.overlay-title');
+    var shots = overlay.querySelector('.shots');
+
+    document.querySelectorAll('.show').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var tool = btn.closest('.tool');
+        var tpl = btn.nextElementSibling;
+        title.textContent = tool.querySelector('h2').textContent;
+        shots.className = 'shots shots-' + tpl.dataset.layout;
+        shots.replaceChildren(tpl.content.cloneNode(true));
+        overlay.showModal();
+      });
+    });
+
+    overlay.querySelector('.close').addEventListener('click', function () { overlay.close(); });
+    // Click anywhere outside a screenshot closes it
+    overlay.addEventListener('click', function (e) {
+      if (e.target.tagName !== 'IMG' && !e.target.closest('.close')) overlay.close();
+    });
+    // Drop the images so GIFs stop playing in the background
+    overlay.addEventListener('close', function () { shots.replaceChildren(); });
+  })();
+</script>
 
 </body>
 </html>
